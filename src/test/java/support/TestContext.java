@@ -1,6 +1,8 @@
 // Created by Viacheslav (Slava) Skryabin 04/01/2018
 package support;
 
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Platform;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
@@ -8,12 +10,15 @@ import org.openqa.selenium.edge.EdgeDriver;
 import org.openqa.selenium.firefox.*;
 import org.openqa.selenium.ie.InternetExplorerDriver;
 import org.openqa.selenium.ie.InternetExplorerOptions;
+import org.openqa.selenium.interactions.Actions;
 import org.openqa.selenium.remote.BrowserType;
-import org.openqa.selenium.Platform;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -27,7 +32,41 @@ public class TestContext {
         return driver;
     }
 
-    public static void initialize() {
+    private static HashMap<String, String> data;
+
+    public static void addData (String key, String value){
+        data.put(key, value);
+    }
+
+    public static String getData(String key){
+        return data.get(key);
+    }
+
+    public static HashMap<String, String> loadFromFile() throws Exception {
+
+        File file = new File(System.getProperty("user.dir") + "src/test/resources/downloads/data.yaml");
+        FileInputStream stream = new FileInputStream(file);
+        return new Yaml().load(stream);
+    }
+
+    public static JavascriptExecutor getExecutor() {
+        return (JavascriptExecutor) driver;
+    }
+
+    public static WebDriverWait getWait() {
+        return getWait(5);
+    }
+
+    public static WebDriverWait getWait(int timeout) {
+        return new WebDriverWait(driver, timeout);
+    }
+
+    public static Actions getActions() {
+        return new Actions(driver);
+    }
+
+    public static void initialize() throws Exception {
+        data = loadFromFile();
         initialize("chrome", false);
     }
 
@@ -55,6 +94,7 @@ public class TestContext {
                 ChromeOptions chromeOptions = new ChromeOptions();
                 chromeOptions.addArguments("--start-maximized");
                 chromeOptions.setExperimentalOption("prefs", chromePreferences);
+//                chromeOptions.addExtensions(new File(System.getProperty("user.dir")+ "/src/test/resources/extensions/ChroPath.crx"));
                 if (isHeadless) {
                     chromeOptions.setHeadless(true);
                     chromeOptions.addArguments("--window-size=1920,1080");
@@ -79,7 +119,7 @@ public class TestContext {
                 firefoxProfile.setPreference("browser.helperApps.neverAsk.saveToDisk", "application/zip;application/octet-stream;application/x-zip;application/x-zip-compressed;text/css;text/html;text/plain;text/xml;text/comma-separated-values");
                 firefoxProfile.setPreference("browser.helperApps.neverAsk.openFile", "application/zip;application/octet-stream;application/x-zip;application/x-zip-compressed;text/css;text/html;text/plain;text/xml;text/comma-separated-values");
                 firefoxProfile.setPreference("browser.helperApps.alwaysAsk.force", false);
-                firefoxProfile.setPreference("plugin.disable_full_page_plugi‌​n_for_types", "application/pdf,application/vnd.adobe.xfdf,application/vnd.‌​fdf,application/vnd.‌​adobe.xdp+xml");
+                firefoxProfile.setPreference("plugin.disable_full_page_plugiâ€Œâ€‹n_for_types", "application/pdf,application/vnd.adobe.xfdf,application/vnd.â€Œâ€‹fdf,application/vnd.â€Œâ€‹adobe.xdp+xml");
                 firefoxProfile.setPreference("webdriver.log.driver", "OFF");
                 FirefoxOptions firefoxOptions = new FirefoxOptions().setProfile(firefoxProfile).setLogLevel(FirefoxDriverLogLevel.INFO);
                 if (isHeadless) {
