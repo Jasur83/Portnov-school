@@ -11,12 +11,15 @@ Feature: Smoke steps
     Then I wait for element with xpath "//*[@id='res']" to be present
     Then element with xpath "//*[@id='res']" should contain text "Cucumber"
 
+
   @predefined2
-  Scenario: Predefined steps for DuckDuck
-    Given I open url "https://duckduckgo.com/"
-    Then I should see page title contains "DuckDuckGo"
-    Then element with xpath "//input[@id='search_form_input_homepage']" should be present
-    When I type "Behavior Driven Development" into element with xpath "//input[@id='search_form_input_homepage']"
-    Then I click on element with xpath "//input[@id='search_button_homepage']"
-    Then I wait for element with xpath "//h2[@class='result__title']" to be present
-    Then element with xpath "//div[@class='results--main']" should contain text "cucumber"
+  Scenario: Predefined steps for Yahoo
+    Given I open url "https://www.yahoo.com"
+    Then I should see page title as "Yahoo"
+    Then element with xpath "//input[@id='uh-search-box']" should be present
+    When I type "Behavior Driven Development" into element with xpath "//input[@id='uh-search-box']"
+    Then I click on element with xpath "//button[@id='uh-search-button']"
+    Then I wait for element with xpath "//div[@id='web']" to be present
+    Then element with xpath "//div[@id='web']" should contain text "cucumber"
+
+
