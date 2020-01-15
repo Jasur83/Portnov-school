@@ -21,7 +21,7 @@ public class Hooks {
     }
 
     @After(order = 0)
-    public void scenarioEnd(Scenario scenario) {
+    public void scenarioEnd(Scenario scenario) throws Exception {
         if (scenario.isFailed()) {
             TakesScreenshot screenshotTaker = (TakesScreenshot) getDriver();
             byte[] screenshot = screenshotTaker.getScreenshotAs(OutputType.BYTES);

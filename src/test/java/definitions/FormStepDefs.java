@@ -6,6 +6,9 @@ import cucumber.api.java.en.Then;
 import cucumber.api.java.en.When;
 import pages.*;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static support.TestContext.getData;
 
@@ -33,6 +36,9 @@ public class FormStepDefs {
         form.clickAllovedToContact();
         form.clickPrivacyPolicy();
         form.acceptThirdPartyAgreement();
+        form.fillContactPersonName(getData("contactPersonName"));
+        form.fillContactPersonPhone(getData("contactPersonPhone"));
+
     }
 
     @And("I submit page object form")
@@ -52,6 +58,8 @@ public class FormStepDefs {
         assertThat(result).contains(getData("lastName"));
         assertThat(result).contains(getData("savedPassword"));
         assertThat(result).contains(getData("address"));
+        assertThat(result).contains(getData("contactPersonName"));
+        assertThat(result).contains(getData("contactPersonPhone"));
 
         assertThat(verifyPage.getContact()).contains("true");
         assertThat(verifyPage.getPolicy()).contains("true");
@@ -110,5 +118,67 @@ public class FormStepDefs {
         UspsPostcardCalculate calculate = new UspsPostcardCalculate();
         calculate.clickCalculate();
         assertThat(calculate.getCost()).isEqualTo(cost);
+    }
+
+    @Then("I verify confirm password field is disabled")
+    public void iVerifyConfirmPasswordFieldIsDisabled() {
+
+        assertThat(new SampleForm().isConfirmPasswordDisabled()).isTrue();
+    }
+
+    @And("I verify password field requires {int} characters")
+    public void iVerifyPasswordFieldRequiresCharacters(int minSize){
+        SampleForm form = new SampleForm();
+//       instead form.fillPassword("1234");
+        for(int i = 0; i < minSize - 1; i++){
+            form.fillPassword("A");
+        }
+        form.clickSubmitButton();
+        assertThat(new SampleForm().isPasswordErrorDisplayed()).isTrue();
+
+        form.fillPassword("A");
+        assertThat(new SampleForm().isPasswordErrorDisplayed()).isFalse();
+    }
+
+
+    @And("I verify that password field is masked")
+    public void iVerifyThatPasswordFieldIsMasked() {
+
+        assertThat(new SampleForm().getPasswordType()).isEqualTo("password");
+    }
+
+    @Then("I verify confirm password field is enabled when password field")
+    public void iVerifyConfirmPasswordFieldIsEnabledWhenPasswordField() {
+        SampleForm form = new SampleForm();
+        form.fillPassword("12345");
+        assertThat(form.isConfirmPasswordEnabled()).isTrue();
+
+    }
+
+    @And("I verify email does not accept invalid email format")
+    public void iVerifyEmailDoesNotAcceptInvalidEmailFormat() {
+
+        SampleForm email = new SampleForm();
+        email.fillEmail("wrongFormat");
+        email.clickSubmitButton();
+        assertThat(email.isEmailErrorDisplayed()).isTrue();
+    }
+
+    @Then("I verify application date is today's date")
+    public void iVerifyApplicationDateIsTodaySDate() {
+        String applicationDate = new SampleForm().getCurrentDate();
+        Date today = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        String todayString = dateFormat.format(today);
+         assertThat(applicationDate).isEqualTo(todayString);
+    }
+
+    @And("I verify email does not accept {string} format")
+    public void iVerifyEmailDoesNotAcceptFormat(String invalidEmail) {
+
+        SampleForm email = new SampleForm();
+        email.fillEmail(invalidEmail);
+        email.clickSubmitButton();
+        assertThat(email.isEmailErrorDisplayed()).isTrue();
     }
 }
